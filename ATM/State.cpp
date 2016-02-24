@@ -27,18 +27,21 @@ State::State(void){
 }
 
 //writes all the transactions in the transaction vector to the output file
-void State::writetransactions(){
+void State::writetransactions(string filename){
+  // cout << "writing" << endl;
   //create the ofstream object and open the file
   ofstream ofile;
-  ofile.open ("output.txt");
-
-  //write each of the objects in the transactions vector to the file
-  for (int i = 0; i < this->transactions.size(); i++){
-    ofile << this->transactions.at(i);
+  ofile.open (filename);
+  if (ofile.is_open()){
+    //write each of the objects in the transactions vector to the file
+    for (int i = 0; i < this->transactions.size(); i++){
+      ofile << this->transactions.at(i);
+    }
+    //close the file
+    ofile.close();
+  }else{
+    cout << "unable to open output file" << endl;
   }
-
-  //close the file
-  ofile.close();
 }
 
 //adds a transaction to the transactions vector
@@ -760,10 +763,10 @@ void State::changeplan(){
 }
 
 //logout and write transactions to the output file
-void State::logout(){
+void State::logout(string filename){
   loggedin = false;
+  writetransactions(filename);
   cout << "Successful Logout" << endl;
-  writetransactions();
 
   //enable all accounts
   for (int i = 0; i < accountlist.size(); i++){

@@ -43,9 +43,9 @@ public:
   //adds a transaction to the transactions vector
   void addtransaction(int code, string name, string account, float funds, string misc);
   //writes all the transactions in the transaction vector to the output file
-  void writetransactions();
+  void writetransactions(string filename);
   void login();
-  void logout();
+  void logout(string filename);
   void withdrawal();
   void deposit();
   void transfer();

@@ -63,7 +63,7 @@ State systemstate;
 // }
 
 
-int main ()
+int main (int argc, char* argv[])
 {
   string cmd;
   //load current bank accounts file
@@ -80,7 +80,13 @@ int main ()
   string line;
 
   //load current bank accounts file
-  string filename = "CurrentBankAccounts.txt";
+  // string filename = "CurrentBankAccounts.txt";
+  if (argc != 3){
+    cout << "Program requires 2 arguments" << endl;
+    return 0;
+  }
+  
+  string filename = argv[1];
   ifstream myfile (filename.c_str());
 
   if (myfile.is_open()){
@@ -172,7 +178,8 @@ int main ()
         }else if(cmd.compare("changeplan") == 0){
           systemstate.changeplan();
         }else if(cmd.compare("logout") == 0){
-          systemstate.logout();
+            // cout << "filename:" << argv[2] << endl;
+          systemstate.logout(argv[2]);
         }else{
           cout << "command not recognized" << endl;
         } 
