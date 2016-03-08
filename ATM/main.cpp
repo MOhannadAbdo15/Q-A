@@ -34,33 +34,39 @@ State systemstate;
 //systemstate class used
 // Accountsystemstate systemstate;
 
-// //Prints an account's details to the console. Mostly for testing purposes.
-// void printAccount(Account account){
-//   cout << "Account Number:" << account.number << endl;
-//   cout << "Account Holder:" << account.holder << endl;
-//   cout << "Account Status:";
-//   if (account.active == 1){
-//     cout << "Active";
-//   }else{
-//     cout << "Disabled";
-//   }
-//   cout << endl;
-//   cout << "Account Balance:" << account.balance << endl;
-//   cout << "Account Status:";
-//   if (account.student){
-//     cout << "Student";
-//   }else{
-//     cout << "Non Student";
-//   }
-//   cout << endl;
-// }
+//Prints an account's details to the console. Mostly for testing purposes.
+void printAccount(Account account){
+  cout << "Account Number:" << account.number << endl;
+  cout << "Account Holder:" << account.holder << ";" << endl;
+  cout << "Account Status:";
+  if (account.active == 1){
+    cout << "Active";
+  }else{
+    cout << "Disabled";
+  }
+  cout << endl;
+  cout << "Account Balance:" << account.balance << endl;
+  cout << "Account Status:";
+  if (account.student){
+    cout << "Student";
+  }else{
+    cout << "Non Student";
+  }
+  cout << endl;
+}
 
-// //Prints all the accounts in the accountlist vector to the console.
-// void printAllAccounts(){
-//   for (int i = 0; i < systemstate.accountlist.size(); i++){
-//     printAccount(systemstate.accountlist.at(i));
-//   }
-// }
+//Prints all the accounts in the accountlist vector to the console.
+void printAllAccounts(){
+  for (int i = 0; i < systemstate.accountlist.size(); i++){
+    printAccount(systemstate.accountlist.at(i));
+  }
+}
+
+std::string& trim(
+  std::string&       s)
+{
+  return s.erase( s.find_last_not_of( " \n\r" ) + 1 );
+}
 
 
 int main (int argc, char* argv[])
@@ -99,31 +105,38 @@ int main (int argc, char* argv[])
       //Start reading tokens, seperated by spaces
 
       //First token is number
-      char * tok = strtok(cline, " ");
-      tmp.number = tok;
+      // char * tok = strtok(cline, " ");
+      // tmp.number = tok;
+
+      tmp.number = line.substr(0,5);
 
       //Second token is name of the holder of the account.
       //TODO: Currently we set the delimiter as a space, making spaces in names not supported.
-      tok = strtok(NULL, " ");
-      tmp.holder = tok;
+      // tok = strtok(NULL, "  ");
+      // tmp.holder = tok;
+
+      tmp.holder = line.substr(6,20);
+      trim(tmp.holder);
 
       //Third token is A or D for enabled/disabled account.
-      tok = strtok(NULL, " ");
+      // tok = strtok(NULL, " ");
 
-      if (tok[0] == 'A'){
+      // cout << line.substr(26,1) << endl;
+      if (line.substr(26,1).compare("A") == 0){
         tmp.active = 1;
       }else{
         tmp.active = 0;
       }
 
       //Fourth token is Balance for the account
-      tok = strtok(NULL, " ");
-      tmp.balance = atof(tok);
+      // tok = strtok(NULL, " ");
+      // tmp.balance = atof(tok);
+      tmp.balance = stof(line.substr(28,8));
 
       //Fifth token is student/non student account
-      tok = strtok(NULL, " ");
+      // tok = strtok(NULL, " ");
 
-      if (tok[0] == 'S'){
+      if (line.substr(37,1).compare("S") == 0){
         tmp.student = true;
       }else{
         tmp.student = false;
@@ -135,16 +148,23 @@ int main (int argc, char* argv[])
       systemstate.accountlist.push_back(tmp);
     }
     myfile.close();
-  }
 
+
+
+  // printAllAccounts();
+
+
+
+  }
   else {
-    cout << "Unable to open file";
+    cout << "Unable to open file" << endl;
   }
 
   do{
-    cout << "Please enter a command: ";
+    cout << "Please enter a command: " << endl;
     getline(cin, cmd);
-
+    trim(cmd);
+    // cout << "Command: ;" << cmd << ";" << endl;
     // cout << systemstate.loggedin << endl;
     if (cmd.compare("exit") == 0){
       return 0;
@@ -183,6 +203,7 @@ int main (int argc, char* argv[])
         }else{
           cout << "command not recognized" << endl;
         } 
+        // systemstate.printtransactions();
       }
    }
   }while(true);

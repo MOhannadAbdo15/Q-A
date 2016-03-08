@@ -41,9 +41,11 @@ public:
   //a vector containing all the transaction codes from the session, to be written to the output file after logout
   vector<string> transactions;
   //adds a transaction to the transactions vector
-  void addtransaction(int code, string name, string account, float funds, string misc);
+  void addtransaction(int code, string name, string account, float funds, string misc, string student);
   //writes all the transactions in the transaction vector to the output file
   void writetransactions(string filename);
+  //test function
+  void printtransactions();
   void login();
   void logout(string filename);
   void withdrawal();

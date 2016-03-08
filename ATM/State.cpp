@@ -12,6 +12,7 @@
 #include "State.h"
 #include <string.h>
 #include <iostream>
+#include <regex>
 
 
 using namespace std;
@@ -24,6 +25,14 @@ State::State(void){
   sessionECbill = 0;
   sessionCQbill = 0;
   sessionTVbill = 0;
+}
+
+//test function
+void State::printtransactions(){
+  cout << "Transactions:" << endl;
+  for(std::vector<int>::size_type i = 0; i != this->transactions.size(); i++) {
+    cout << this->transactions.at(i) << endl;
+  }
 }
 
 //writes all the transactions in the transaction vector to the output file
@@ -45,12 +54,16 @@ void State::writetransactions(string filename){
 }
 
 //adds a transaction to the transactions vector
-void State::addtransaction(int code, string name, string account, float funds, string misc){
+void State::addtransaction(int code, string name, string account, float funds, string misc, string admin){
   string line = "";
   string spaces = "";
 
   //add transaction code followed by a space
-  line = line + "0" + to_string(code) + " ";
+  if (code < 10){
+    line = line + "0" + to_string(code) + " ";
+  }else{
+    line = line + to_string(code) + " ";
+  }
 
   //add account holder's name
   //reset spaces string
@@ -82,12 +95,23 @@ void State::addtransaction(int code, string name, string account, float funds, s
   
   //pad spaces
   for (int i = 0; i < 8 - (stream.str()).length(); i++){
-    spaces = spaces + " ";
+    spaces = spaces + "0";
   }
-  line = line + stream.str() + spaces + " ";
+  line = line + spaces+ stream.str() + " ";
 
   //add misc info
+  //pad spaces
+  if (misc.length() == 2){
+    misc = misc + " ";
+  }
+
   line = line + misc;
+
+  //add admin/non admin
+  // if (admin.length() == 1){
+  //   admin = admin + " ";
+  // }
+  line = line + admin;
 
   //add line break
   line = line + "\n";
@@ -147,13 +171,13 @@ void State::loadaccounts(string filename){
       tmp.available = true;
 
       //adds the temporary account to the accountlist
-      cout << "pushing:" << endl;
+      // cout << "pushing:" << endl;
       this->accountlist.push_back(tmp);
     }
 
     for (int i = 0; i < this->accountlist.size(); i++){
-    cout << "printing:" << endl;
-    cout << this->accountlist.at(i).number << endl;
+    // cout << "printing:" << endl;
+    // cout << this->accountlist.at(i).number << endl;
     }
     myfile.close();
   }
@@ -165,6 +189,7 @@ void State::loadaccounts(string filename){
 
 void State::login(){
   string input;    
+  string admin;
   // cout << "login status: " << loggedin << endl;
 
   //don't allow login when logged in
@@ -173,19 +198,25 @@ void State::login(){
   }else{
     cout << "Enter session type" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( " \n\r" ) + 1 );
     if(input.compare("admin") == 0){
       sessiontype = 1;
+      admin = "A ";
     }else if(input.compare("standard") == 0){
       cout << "Enter account holder's name" << endl;
       getline(cin, input);
+      input.erase( input.find_last_not_of( "\n\r" ) + 1 );
       name = input;
       sessiontype = 0;
+      admin = "S ";
     }else{
-      cout << "input not recognized" << endl;
+      cout << "input not recognized:" << input << endl;
       return;
     }
     loggedin = 1;
     cout << "Successful Login" << endl;
+
+    addtransaction(10, name, "00000", 00000.00, admin, "N");        
     // cout << "login status: " << loggedin << endl;
   }
 }
@@ -201,12 +232,14 @@ void State::withdrawal(){
   if (sessiontype){
     cout << "Enter account holder's name" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( "\n\r" ) + 1 );
     name = input;
   }
 
   //ask for account number
   cout << "Enter account number" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( "\n\r" ) + 1 );
   destaccount = input;
 
   //Try and find the account number in the list.
@@ -238,11 +271,24 @@ void State::withdrawal(){
   //ask for amount
   cout << "Enter amount to withdraw" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( "\n\r" ) + 1 );
   amount = stof(input);
+
+  //check if it matches the number pattern
+  if (input.substr(input.length()-3,1).compare(".") != 0){
+    cout << "Malformed number input" << endl;
+    return;
+  }
 
   //multiples of 5
   if((int)amount % 5 != 0){
     cout << "Withdrawal amounts must be in multiples of $5" << endl;
+    return;
+  }
+
+  //negative
+  if(amount < 0){
+    cout << "Withdrawal amounts must be positive" << endl;
     return;
   }
 
@@ -260,12 +306,22 @@ void State::withdrawal(){
     return;
   }
 
+
+  //Check if the account is a student account
+  string student;
+  if(accountlist.at(accountposition).student){
+    student = "S";
+  }else{
+    student = "N";
+  }
+
   //one last check to see if the account holder matches name
   if (accountlist.at(accountposition).holder.compare(name) == 0){
     //subtract withdrawal from systemstate
     accountlist.at(accountposition).balance -= amount;
+    sessionwithdrawn+=amount;
     //add the transaction
-    addtransaction(1, name, destaccount, amount, "00");        
+    addtransaction(1, name, destaccount, amount, "00", student);        
   }else{
     cout << "account holder must match account number" << endl;
   }
@@ -276,6 +332,7 @@ void State::transfer(){
   string input;
   string sourceaccount;
   string destaccount;
+  float fees;
   float amount;
   //accountposition is where in the accountlist vector the inputted account is.
   int accountposition = -1;
@@ -285,12 +342,14 @@ void State::transfer(){
   if (sessiontype){
     cout << "Enter account holder's name" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( "\n\r" ) + 1 );
     name = input;
   }
 
   //ask for source account number
   cout << "Enter account number for source account" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( "\n\r" ) + 1 );
   sourceaccount = input;
 
   //Try and find the account number in the list.
@@ -322,6 +381,7 @@ void State::transfer(){
   //ask for destination account number
   cout << "Enter account number of destination account" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( "\n\r" ) + 1 );
   destaccount = input;
 
   //repeat the above process for the destination account
@@ -343,7 +403,30 @@ void State::transfer(){
   //ask for amount
   cout << "Enter amount to transfer" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( "\n\r" ) + 1 );
   amount = stof(input);
+
+  //check if it matches the number pattern
+  if (input.substr(input.length()-3,1).compare(".") != 0){
+    cout << "Malformed number input" << endl;
+    return;
+  }
+
+  //negative
+  if(amount < 0){
+    cout << "Transfer amounts must be positive" << endl;
+    return;
+  }
+
+  //Check if the account is a student account
+  string student;
+  if(accountlist.at(accountposition).student){
+    student = "S";
+    fees = 0.05;
+  }else{
+    student = "N";
+    fees = 0.10;
+  }
 
   //check for session transfer limit
   if(!sessiontype){
@@ -351,12 +434,26 @@ void State::transfer(){
       cout << "Session transfer limit reached" << endl;
       return;
     }
+
+    cout << accountlist.at(accountposition).balance - fees << endl;
+    if (amount > (accountlist.at(accountposition).balance - fees)) {
+      cout << "Source account has insufficient funds" << endl;
+      return;      
+    }
+  }else{
+    //check if the source account has enough money
+    if(amount > accountlist.at(accountposition).balance){
+      cout << "Source account has insufficient funds" << endl;
+      return;
+    }
   }
 
-  //check if the source account has enough money
-  if(amount > accountlist.at(accountposition).balance){
-    cout << "Source account has insufficient funds" << endl;
-    return;
+  //Check if the dest account is a student account
+  string deststudent;
+  if(accountlist.at(destaccountposition).student){
+    student = "S";
+  }else{
+    student = "N";
   }
 
   //one last check to see if the account holder matches name
@@ -366,8 +463,9 @@ void State::transfer(){
     //add money from the systemstate destination account
     accountlist.at(destaccountposition).balance += amount;
     //add the transactions
-    addtransaction(2, name, sourceaccount, amount, "00");        
-    addtransaction(2, name, destaccount, amount, "00");        
+    addtransaction(2, name, sourceaccount, amount, "00",student);        
+    addtransaction(2, name, destaccount, amount, "00", deststudent); 
+    sessiontransfer = amount + sessiontransfer;
   }else{
     cout << "account holder must match account number" << endl;
   }
@@ -385,12 +483,14 @@ void State::paybill(){
   if (sessiontype){
     cout << "Enter account holder's name" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( "\n\r" ) + 1 );
     name = input;
   }
 
   //ask for account number
   cout << "Enter account number" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( "\n\r" ) + 1 );
   sourceaccount = input;
 
   //find the account
@@ -420,10 +520,11 @@ void State::paybill(){
   //ask for company to pay to
   cout << "Enter company to pay to" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( "\n\r" ) + 1 );
   company = input;
 
   //check for incorrect input
-  if (company.compare("EC") == 0 || company.compare("CQ") == 0 || company.compare("TV") == 0){
+  if ((company.compare("EC") != 0) && (company.compare("CQ") != 0) && (company.compare("TV") != 0)){
     cout << "Company not recognized" << endl;
     return;
   }
@@ -431,7 +532,15 @@ void State::paybill(){
   //ask for amount
   cout << "Enter amount to pay" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( "\n\r" ) + 1 );
   amount = stof(input);
+
+  //check if it matches the number pattern
+  if (input.substr(input.length()-3,1).compare(".") != 0){
+    cout << input.substr(input.length()-3,1) << endl;
+    cout << "Malformed number input" << endl;
+    return;
+  }
 
   //check for bill payment limits, only if we aren't admin
   if(!sessiontype){
@@ -459,11 +568,19 @@ void State::paybill(){
     }
   }
 
+  //Check if the account is a student account
+  string student;
+  if(accountlist.at(accountposition).student){
+    student = "S";
+  }else{
+    student = "N";
+  }
+
   if (accountlist.at(accountposition).holder.compare(name) == 0){
     //remove the money from the account
     accountlist.at(accountposition).balance -= amount;
     //add the transaction
-    addtransaction(4, name, sourceaccount, amount, company);        
+    addtransaction(4, name, sourceaccount, amount, company, student);        
   }else{
     cout << "account holder must match account number" << endl;
   }
@@ -480,12 +597,14 @@ void State::deposit(){
   if (sessiontype){
     cout << "Enter account holder's name" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( " \n\r" ) + 1 );
     name = input;
   }
 
   //ask for account number
   cout << "Enter account number" << endl;
   getline(cin, input);
+  input.erase( input.find_last_not_of( " \n\r" ) + 1 );
   destaccount = input;
 
   for (int i = 0; i < accountlist.size(); i++){
@@ -514,13 +633,47 @@ void State::deposit(){
   //ask for amount
   cout << "Enter amount to deposit" << endl;
   getline(cin, input);
-  amount = stof(input);
+  input.erase( input.find_last_not_of( " \n\r" ) + 1 );
+  cout << "input:" << input << endl; 
+  //check if it matches the number pattern
+  if (input.substr(input.length()-3,1).compare(".") != 0){
+    cout << "Malformed number input" << endl;
+    return;
+  }
+
+  cout << fixed << setprecision(2) << input << endl;
+  amount = (float) stof(input);
+  cout << fixed << setprecision(2) << amount << endl;
+
+  cout << "amt:" << amount << endl;
+
+  //deposits must be positive
+  if (amount < 0){
+    cout << "Amount deposited must be positive" << endl;
+    return;
+  }
+
+  //deposits must not push a balance over maximum
+  // cout << accountlist.at(accountposition).balance << " " << amount << " " << endl;
+  // cout <<  accountlist.at(accountposition).balance + amount << endl;
+  if(accountlist.at(accountposition).balance + amount >= 100000){
+    cout << "Deposit would cause balance to exceed maximum" << endl;
+    return;
+  }
+
+  //Check if the account is a student account
+  string student;
+  if(accountlist.at(accountposition).student){
+    student = "S";
+  }else{
+    student = "N";
+  }
 
   if (accountlist.at(accountposition).holder.compare(name) == 0){
     //add the amount to the accountlist
     accountlist.at(accountposition).balance += amount;
     //add the transaction
-    addtransaction(4, name, destaccount, amount, "00");        
+    addtransaction(4, name, destaccount, amount, "00", student);        
   }else{
     cout << "account holder must match account number" << endl;
   }
@@ -539,13 +692,22 @@ void State::create(){
 
     //truncate a name that's too long
     if (name.length() > 20){
-      name.resize(20);
+      name = name.substr(0,20);
+    }else{
+      name.erase( input.find_last_not_of( " \n\r" ) + 1 );
     }
+    cout << name << endl;
 
     //ask for account number
     cout << "Enter inital balance" << endl;
     getline(cin, input);
     newbalance = stof(input);
+
+    //check if it matches the number pattern
+    if (input.substr(input.length()-3,1).compare(".") != 0){
+      cout << "Malformed number input" << endl;
+      return;
+    }
 
     //check if the balance is too large
     if (newbalance > 99999.99){
@@ -557,7 +719,7 @@ void State::create(){
     int newaccountnumber; 
     int lastnumber = stoi(accountlist.at(accountlist.size()-1).number) + 1;
     //add the transaction
-    addtransaction(5, name, to_string(lastnumber), newbalance, "00");        
+    addtransaction(5, name, to_string(lastnumber), newbalance, "00", "N");        
 
   }else{
     //only admins can do this
@@ -574,11 +736,13 @@ void State::deleteaction(){
   if (sessiontype){
     cout << "Enter account holder's name" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( " \n\r" ) + 1 );
     name = input;
 
     //ask for account number
     cout << "Enter account number" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( " \n\r" ) + 1 );
     sourceaccount = input;
 
     for (int i = 0; i < accountlist.size(); i++){
@@ -590,7 +754,9 @@ void State::deleteaction(){
         }
         if (accountlist.at(i).holder.compare(name) == 0){
           //add the transaction
-          addtransaction(6, name, sourceaccount, 0.00, "00");        
+          cout << "Account Deleted." << endl;
+          addtransaction(6, name, sourceaccount, 0.00, "00", "N");
+          accountlist.erase(accountlist.begin()+i);        
           return;
         }else{
           cout << "account holder must match account number" << endl;
@@ -617,11 +783,13 @@ void State::enable(){
   if (sessiontype){
     cout << "Enter account holder's name" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( " \n\r" ) + 1 );
     name = input;
 
     //ask for account number
     cout << "Enter account number" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( " \n\r" ) + 1 );    
     sourceaccount = input;
 
     for (int i = 0; i < accountlist.size(); i++){
@@ -637,7 +805,7 @@ void State::enable(){
           //account must be disabled
           if (!accountlist.at(i).active){
             //add the transaction
-            addtransaction(9, name, sourceaccount, 0.00, "00");        
+            addtransaction(9, name, sourceaccount, 0.00, "00", "N");        
             return;
           }else{
             cout << "account needs to be disabled" << endl;
@@ -668,11 +836,13 @@ void State::disable(){
   if (sessiontype){
     cout << "Enter account holder's name" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( " \n\r" ) + 1 );    
     name = input;
 
     //ask for account number
     cout << "Enter account number" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( " \n\r" ) + 1 );    
     sourceaccount = input;
 
     //loop over account list
@@ -689,7 +859,7 @@ void State::disable(){
           //account must be enabled
           if (accountlist.at(i).active){
             //add the transaction
-            addtransaction(07, name, sourceaccount, 0.00, "00");        
+            addtransaction(07, name, sourceaccount, 0.00, "00", "N");        
             return;
           }else{
             cout << "account needs to be enabled" << endl;
@@ -716,15 +886,30 @@ void State::changeplan(){
   string input;
   string sourceaccount;
   bool found;
+  bool namefound = false;
   //if admin, ask for account holder's name
   if (sessiontype){
     cout << "Enter account holder's name" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( "\n\r" ) + 1 );
     name = input;
+
+    //check for real names
+    for (int i = 0; i < accountlist.size(); i++){
+      if (accountlist.at(i).holder.compare(name) == 0){
+        namefound = true;
+      }
+    }
+
+    if (namefound == false){
+      cout << "name does not exist" << endl;
+      return;
+    }
 
     //ask for account number
     cout << "Enter account number" << endl;
     getline(cin, input);
+    input.erase( input.find_last_not_of( "\n\r" ) + 1 );
     sourceaccount = input;
 
     for (int i = 0; i < accountlist.size(); i++){
@@ -740,7 +925,7 @@ void State::changeplan(){
           //account must be student
           if (accountlist.at(i).student){
             //add the transaction
-            addtransaction(8, name, sourceaccount, 0.00, "00");        
+            addtransaction(8, name, sourceaccount, 0.00, "00", "S");        
             return;
           }else{
             cout << "account needs to be student plan" << endl;
@@ -765,6 +950,7 @@ void State::changeplan(){
 //logout and write transactions to the output file
 void State::logout(string filename){
   loggedin = false;
+  addtransaction(0,"","",0.0,"00","N");
   writetransactions(filename);
   cout << "Successful Logout" << endl;
 
