@@ -5,19 +5,27 @@ import java.lang.*;
 import java.io.*;
 
 public class Account {
+
 	private String num;
 	private String name;
+	//Status is either "A" for active or "D" for disabled
 	private String status;
 	private double balance;
+	private double frozenbalance;
 	private int transactions;
 	private boolean createdtoday;
+	//student is TRUE if the account is a student account
+	private boolean student;
 
-	public Account(String newnum,String newname, String newstatus, double newbalance, int newtransactions){
+	public Account(String newnum,String newname, String newstatus, double newbalance, int newtransactions, boolean newstudent){
 		num = newnum;
 		name = newname;
 		status = newstatus;
 		balance = newbalance;
+		frozenbalance = 0;
 		transactions = newtransactions;
+		student = newstudent;
+		createdtoday = true;
 	}
 
 	//test function that prints out this object's entire member variables;
@@ -27,6 +35,7 @@ public class Account {
 		System.out.println("Name:" + name);
 		System.out.println("Status:" + status);
 		System.out.println("Balance:" + balance);
+		System.out.println("Frozen balance:" + frozenbalance);
 		System.out.println("Transactions:" + transactions);
 	}
 
@@ -70,6 +79,20 @@ public class Account {
 		transactions = newtransactions;
 	}
 
+	public void incTransactions(){
+		if (transactions < 9999){
+			transactions++;
+		}
+	}
+
+	public boolean getStudent(){
+		return student;
+	}
+
+	public void setStudent(boolean newstudent){
+		student = newstudent;
+	}
+
 	public boolean getCreated(){
 		return createdtoday;
 	}
@@ -81,4 +104,17 @@ public class Account {
 			createdtoday = true;
 		}
 	}
+	
+	public void setCreated(boolean newcreatedtoday){
+		createdtoday = newcreatedtoday;
+	}	
+
+	public double getFrozen(){
+		return frozenbalance;
+	}
+
+	public void setFrozen(double newfrozen){
+		frozenbalance = newfrozen;
+	}
+
 }

@@ -9,7 +9,7 @@ public class Transaction {
 	private String code;
 	private String accname;
 	private String accnum;
-	private float amount;
+	private double amount;
 	private String misc;
 	private boolean student;
 
@@ -37,11 +37,11 @@ public class Transaction {
 		accnum = newnum;
 	}
 
-	public Float getAmount(){
+	public double getAmount(){
 		return amount;
 	}
 
-	public void setAmount(String newamt){
+	public void setAmount(double newamt){
 		amount = newamt;
 	}
 
@@ -58,6 +58,6 @@ public class Transaction {
 	}
 
 	public void setStudent(Boolean newstudent){
-		code = newcode;
+		student = newstudent;
 	}
 }
