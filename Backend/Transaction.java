@@ -1,3 +1,5 @@
+//Transaction class.
+//Each instance of this class should represent one line in a transaction file.
 package Backend;
 
 import java.util.*;
@@ -13,6 +15,7 @@ public class Transaction {
 	private String misc;
 	private boolean student;
 
+	//Test method
 	public void printTransaction(){
 		System.out.println("===Transaction===");
 		System.out.println("Code:" + code + ";");

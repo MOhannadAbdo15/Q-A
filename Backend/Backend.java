@@ -1,3 +1,8 @@
+//Backend class
+//This class recieves the transactions and accounts array from 
+//the writer, applies all the transactions to the accounts array
+//and then passes the accounts array back to the writer for IO.
+
 package Backend;
 
 import java.util.*;
@@ -178,6 +183,7 @@ public class Backend {
 			//change all the accounts to "not made today"
 			accounts.get(i).setCreated(false);
 		}
+		loggedin = false;
 		sessionWithdrawn = 0;
 	}
 
@@ -204,12 +210,13 @@ public class Backend {
 		admin = false;
 		loginname = "";
 		loggedin = false;
-		//get accounts and transactions arraylists from writer
 
+		//get accounts and transactions arraylists from writer
 		Writer backendwriter = new Writer(args);
 		accounts = backendwriter.getAccounts();
 		transactions = backendwriter.getTransactions();
 
+		//Test functions
 		// for (int i = 0; i < accounts.size();i++) {
 		// 	accounts.get(i).printAccount();
 		// }
@@ -218,7 +225,8 @@ public class Backend {
 		// 	transactions.get(i).printTransaction();
 		// }
 		
-		backendwriter.write();
+		//Test write()
+		// backendwriter.write();
 		
 		// transactions = new ArrayList<Transaction>();		
 		//iterate over all the entires in the transactions arraylist
@@ -274,8 +282,6 @@ public class Backend {
 			}
 		}
 
-		System.out.println("====New Accounts====");
-		backendwriter.write();
 		
 		// for (int i = 0; i < accounts.size();i++) {
 		// 	accounts.get(i).printAccount();
@@ -283,5 +289,9 @@ public class Backend {
 
 		//pass back the accounts list
 		backendwriter.setAccounts(accounts);
+		
+		//Write out to file
+		System.out.println("====New Accounts====");
+		backendwriter.write();
 	}
 }

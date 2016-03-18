@@ -1,3 +1,5 @@
+//Account class
+//One account class represents one account and all it's properties.
 package Backend;
 
 import java.util.*;
@@ -11,14 +13,16 @@ public class Account {
 	//Status is either "A" for active or "D" for disabled
 	private String status;
 	private double balance;
+	//balance that is inaccesable
 	private double frozenbalance;
 	private int transactions;
+	//whether the account was created today, certain operations are not avaliable for newly created accounts
 	private boolean createdtoday;
 	//student is TRUE if the account is a student account
 	private boolean student;
 
+	//Empty constructor for debug reasons.
 	public Account(){
-
 	}
 
 	public Account(String newnum,String newname, String newstatus, double newbalance, int newtransactions, boolean newstudent){

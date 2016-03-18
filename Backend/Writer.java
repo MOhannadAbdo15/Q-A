@@ -1,12 +1,13 @@
 package Backend;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.PrintWriter;
-import java.io.IOException;
+// import java.io.BufferedReader;
+// import java.io.FileNotFoundException;
+// import java.io.FileReader;
+// import java.io.PrintWriter;
+// import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.*;
 
 public class Writer 
 {
@@ -57,20 +58,29 @@ public class Writer
 				newAccount += mb.get(i).getName() + " ";
 				newAccount += mb.get(i).getStatus() + " ";
 				newAccount += mb.get(i).getBalance() + " ";
+				
+				//currentAccount will be written to the current bank accounts file
+				String currentAccount = newAccount;
+
 				newAccount += mb.get(i).getTransactions() + " ";
 				if (mb.get(i).getStudent() == true){
-					newAccount += "S"; 
+					newAccount += "S";
+					currentAccount += "S"; 
 				}else{
 					newAccount += "N"; 
+					currentAccount += "N"; 
 				}
 
 				System.out.println(newAccount);
-				
+
 				newAccount += "\n";
+				currentAccount += "\n";
 
 				writer.write(newAccount);
+				writer2.write(currentAccount);
 
 				newAccount = "";
+				currentAccount = "";
 			}
 
 			writer.close();
@@ -86,9 +96,6 @@ public class Writer
 
 	public Writer(String[] args) {
 		
-		//declare student plan 	
-		boolean student;
-		
 		//Accept multiple transaction files
 		String MasterBankAccounts ="";
 		String BankAccountTransactions = "";
@@ -97,63 +104,71 @@ public class Writer
 		MasterBankAccounts = args[0];
 
 		//BankAccountTransactions = args[1];
-		
-		//Loading transactions
-		for(int i= 1; i < args.length; i++){
-			BankAccountTransactions = args[i];
-			try{
+		try{
 
-				//System.out.println(args[i]);
-				FileReader fileReader2 = new FileReader(BankAccountTransactions);
+			PrintWriter mergewriter = new PrintWriter(new FileOutputStream(new File("MergedBankAccountTransactionFile.txt"),true));
+			
+			//Loading transactions
+			for(int i= 1; i < args.length; i++){
+				BankAccountTransactions = args[i];
+				try{
 
-				BufferedReader bufferedReader2 = new BufferedReader(fileReader2);
-		        
-				String line = "";
-				line = bufferedReader2.readLine();
-				while(line!=null){
-					//System.out.println(line);;
-					Transaction newtransaction = new Transaction();
+					//System.out.println(args[i]);
+					FileReader fileReader2 = new FileReader(BankAccountTransactions);
+					BufferedReader bufferedReader2 = new BufferedReader(fileReader2);
+	    			
+	    			// mergewriter.write("hello world");
 
-					//*******Need to trim whitespace;*********
-
-					newtransaction.setCode(line.substring(0,2));
-					newtransaction.setName(line.substring(3,23).trim());
-					newtransaction.setNum(line.substring(24,29));
-
-					String balance = line.substring(30, 38);
-					//System.out.println(balance);
-					float newBalance = Float.parseFloat(balance);
-
-					newtransaction.setAmount(newBalance);
-
-					// System.out.println(balance);
-
-					String plan = line.substring(39, 41);
-					newtransaction.setMisc(line.substring(39, 41));
-
-					String linestudent = line.substring(42,43);
-
-					
-					if(plan.equals("N ")){
-						student=false;
-						newtransaction.setStudent(false);
-						// System.out.println("Plan : Non-Student Plan");
-					}else if(plan.equals("S ")){
-						student=true;
-						newtransaction.setStudent(true);
-						// System.out.println("Plan : Student Plan");
-					}else{
-						// System.out.println("Error found in Master Bank Accounts File");
-					}
-
-					//add to the arraylist
-					ls.add(newtransaction);
+					String line = "";
 					line = bufferedReader2.readLine();
-				}
-			}catch(IOException ex) {
-		    	System.out.println("Error reading file '" + BankAccountTransactions + "'");
-			} 
-		} 
+					while(line!=null){
+
+						//write to merged file
+						// System.out.println("Writing to Merge: " + line);
+						mergewriter.write(line + "\n");
+
+						//System.out.println(line);
+						Transaction newtransaction = new Transaction();
+
+						//*******Need to trim whitespace;*********
+
+						newtransaction.setCode(line.substring(0,2));
+						newtransaction.setName(line.substring(3,23).trim());
+						newtransaction.setNum(line.substring(24,29));
+
+						String balance = line.substring(30, 38);
+						//System.out.println(balance);
+
+						//*******Need to change to decimal precison of 2*******
+						float newBalance = Float.parseFloat(balance);
+
+						newtransaction.setAmount(newBalance);
+
+						String plan = line.substring(39, 41);
+						newtransaction.setMisc(line.substring(39, 41));
+
+						String linestudent = line.substring(42,43);
+						
+						if(plan.equals("N ")){
+							newtransaction.setStudent(false);
+						}else if(plan.equals("S ")){
+							newtransaction.setStudent(true);
+						}else{
+							// System.out.println("Error found in Master Bank Accounts File");
+						}
+
+						//add to the arraylist
+						ls.add(newtransaction);
+						line = bufferedReader2.readLine();
+					}
+					mergewriter.close();
+				}catch(IOException ex) {
+			    	System.out.println("Error reading file '" + BankAccountTransactions + "'");
+				} 
+			}
+		}catch(IOException ex) {
+	    	System.out.println("Error reading file");
+		}  
 
 		//Read Accounts
 	    try {
@@ -168,18 +183,7 @@ public class Writer
 	
 			String line1 = "";
 			line1 = bufferedReader1.readLine();
-			// line1 = null;
 			while(line1!=null){
-				// private String num;
-				// private String name;
-				// //Status is either "A" for active or "D" for disabled
-				// private String status;
-				// private double balance;
-				// private double frozenbalance;
-				// private int transactions;
-				// private boolean createdtoday;
-				// //student is TRUE if the account is a student account
-				// private boolean student;
 
 				Account newaccount = new Account();
 
@@ -202,31 +206,6 @@ public class Writer
 				}
 				newaccount.setCreated(false);
 				newaccount.setFrozen(0);
-
-				// String to_remove = line1.substring(37,41);
-				// mb.add(line1);
-				// String newString = line1.replace(to_remove, "");
-				// System.out.println(newString);
-				//System.out.println(line1.substring(37,41));
-				// cb.add(newString);
-				//System.out.println(cb);
-
-				// String balance = line1.substring(28, 37);
-				//System.out.println(balance);
-				// float newBalance = Float.parseFloat(balance);
-				// System.out.println(balance);
-
-				// String plan = line1.substring(42,43);
-				// System.out.println(plan);
-				
-				// if(plan.equals("N")){
-				// 	student=true;
-				// 	System.out.println("Plan : Non-Student Plan");
-				// }else if(plan.equals("S")){
-				// 	student=false;
-				// 	System.out.println("Plan : Student Plan");
-				// }else
-				// 	System.out.println("Error found in Master Bank Accounts File");
 
 				line1 = bufferedReader1.readLine();
 
