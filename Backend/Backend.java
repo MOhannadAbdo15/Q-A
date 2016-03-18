@@ -13,9 +13,9 @@ public class Backend {
 	//Login data
 	static private boolean admin;
 	static private String loginname;
-	static private boolean loggedin;
+	static private boolean loggedin = false;
 
-	static private Validator validator;
+	static private Validator validator = new Validator();
 	static private Account tempAcc;
 	static private float sessionWithdrawn = 0;
 
@@ -36,7 +36,7 @@ public class Backend {
 	static private void applyTransfer(Transaction sourcetransaction, Transaction desttransaction){
 		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(sourcetransaction.getNum(), accounts);
-			tempDestAcc = validator.findAccount(sourcetransaction.getNum(), accounts);
+			Account tempDestAcc = validator.findAccount(sourcetransaction.getNum(), accounts);
 			//check login credentials
 			if (admin || (validator.accountMatchName(loginname, tempAcc))) {
 				//set balances of the two accounts
@@ -206,6 +206,21 @@ public class Backend {
 		loggedin = false;
 		//get accounts and transactions arraylists from writer
 
+		Writer backendwriter = new Writer(args);
+		accounts = backendwriter.getAccounts();
+		transactions = backendwriter.getTransactions();
+
+		// for (int i = 0; i < accounts.size();i++) {
+		// 	accounts.get(i).printAccount();
+		// }
+
+		// for (int i = 0; i < transactions.size();i++) {
+		// 	transactions.get(i).printTransaction();
+		// }
+		
+		backendwriter.write();
+		
+		// transactions = new ArrayList<Transaction>();		
 		//iterate over all the entires in the transactions arraylist
 		for (int i = 0; i < transactions.size();i++) {
 			switch (transactions.get(i).getCode()){
@@ -259,6 +274,14 @@ public class Backend {
 			}
 		}
 
+		System.out.println("====New Accounts====");
+		backendwriter.write();
+		
+		// for (int i = 0; i < accounts.size();i++) {
+		// 	accounts.get(i).printAccount();
+		// }
+
 		//pass back the accounts list
+		backendwriter.setAccounts(accounts);
 	}
 }

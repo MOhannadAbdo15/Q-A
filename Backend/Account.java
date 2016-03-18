@@ -17,6 +17,10 @@ public class Account {
 	//student is TRUE if the account is a student account
 	private boolean student;
 
+	public Account(){
+
+	}
+
 	public Account(String newnum,String newname, String newstatus, double newbalance, int newtransactions, boolean newstudent){
 		num = newnum;
 		name = newname;
@@ -32,7 +36,7 @@ public class Account {
 	public void printAccount(){
 		System.out.println("===Account===");
 		System.out.println("Number:" + num);
-		System.out.println("Name:" + name);
+		System.out.println("Name:" + name + ";");
 		System.out.println("Status:" + status);
 		System.out.println("Balance:" + balance);
 		System.out.println("Frozen balance:" + frozenbalance);

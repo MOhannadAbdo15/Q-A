@@ -13,6 +13,16 @@ public class Transaction {
 	private String misc;
 	private boolean student;
 
+	public void printTransaction(){
+		System.out.println("===Transaction===");
+		System.out.println("Code:" + code + ";");
+		System.out.println("Accname:" + accname + ";");
+		System.out.println("Accnum:" + accnum);
+		System.out.println("Amount:" + amount);
+		System.out.println("Misc:" + misc);
+		System.out.println("Student:" + student);
+	}
+
 	public String getCode(){
 		return code;
 	}
