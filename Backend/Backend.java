@@ -15,6 +15,9 @@ public class Backend {
 	static ArrayList<Account> accounts = new ArrayList<Account>();
 	static ArrayList<Transaction> transactions = new ArrayList<Transaction>();
 
+	//get accounts and transactions arraylists from writer
+	static Writer backendwriter = new Writer();
+
 	//Login data
 	static private boolean admin;
 	static private String loginname;
@@ -206,15 +209,24 @@ public class Backend {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void load(String[] args){
+		backendwriter = new Writer(args);
+		accounts = backendwriter.getAccounts();
+		transactions = backendwriter.getTransactions();
+	}
+
+	public static void init(String[] args) {
+		load(args);
+		handletransactions();
+		//Write out to file
+		System.out.println("====New Accounts====");
+		backendwriter.write();
+	}
+
+	public static void handletransactions() {
 		admin = false;
 		loginname = "";
 		loggedin = false;
-
-		//get accounts and transactions arraylists from writer
-		Writer backendwriter = new Writer(args);
-		accounts = backendwriter.getAccounts();
-		transactions = backendwriter.getTransactions();
 
 		//Test functions
 		// for (int i = 0; i < accounts.size();i++) {
@@ -289,9 +301,13 @@ public class Backend {
 
 		//pass back the accounts list
 		backendwriter.setAccounts(accounts);
-		
-		//Write out to file
-		System.out.println("====New Accounts====");
-		backendwriter.write();
+	}
+
+	public ArrayList<Account> getAccounts(){
+		return accounts;
+	}
+
+	public ArrayList<Transaction> getTransactions(){
+		return transactions;
 	}
 }

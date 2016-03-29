@@ -15,6 +15,19 @@ public class Transaction {
 	private String misc;
 	private boolean student;
 
+	public Transaction(String newcode, String newname, String newnum, Double newamt, String newmisc, Boolean newstudent){
+		code = newcode;
+		accname = newname;
+		accnum = newnum;
+		amount = newamt;
+		misc = newmisc;
+		student = newstudent;
+	}
+
+	public Transaction(){
+		
+	}
+
 	//Test method
 	public void printTransaction(){
 		System.out.println("===Transaction===");

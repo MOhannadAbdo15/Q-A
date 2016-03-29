@@ -104,14 +104,6 @@ public class Account {
 	public boolean getCreated(){
 		return createdtoday;
 	}
-
-	public void flipCreated(){
-		if (createdtoday){
-			createdtoday = false;
-		}else{
-			createdtoday = true;
-		}
-	}
 	
 	public void setCreated(boolean newcreatedtoday){
 		createdtoday = newcreatedtoday;

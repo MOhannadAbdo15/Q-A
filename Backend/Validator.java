@@ -12,7 +12,7 @@ import java.io.*;
 public class Validator{
 
 	//checks if the session is logged in
-	boolean sessionLoggedIn(boolean loggedin){
+	public boolean sessionLoggedIn(boolean loggedin){
 		if (loggedin) {
 			return true;
 		}else{
@@ -23,7 +23,7 @@ public class Validator{
 
 	//find an account in the accounts list given the number
 	//Checks if the given Account number exists in the given Array List of accounts
-	Account findAccount(String target, ArrayList<Account> accounts){
+	public Account findAccount(String target, ArrayList<Account> accounts){
 		// Iterate through the accounts list
 		for (int i = 0; i < accounts.size();i++) {
 			//If the name is equal return true
@@ -37,7 +37,7 @@ public class Validator{
 	}
 
 	//finds the highest account number in the array, and returns the next number as a String
-	String findNextNumber(ArrayList<Account> accounts){
+	public String findNextNumber(ArrayList<Account> accounts){
 		int largest = 0;
 		// Iterate through the accounts list
 		for (int i = 0; i < accounts.size();i++) {
@@ -49,12 +49,12 @@ public class Validator{
 	}
 
 	//Checks if the given file was just created
-	boolean accountJustCreated(Account target){
+	public boolean accountJustCreated(Account target){
 		return target.getCreated();
 	}
 
 	//Checks to see if a given string matches the name of an account holder
-	boolean accountMatchName(String sourcename, Account target){
+	public boolean accountMatchName(String sourcename, Account target){
 		if (sourcename.equals(target.getName())){
 			return true;
 		}else{
@@ -64,7 +64,7 @@ public class Validator{
 	}
 
 	//Checks to see if the account has enough money 
-	boolean enoughBalance(double amount, Account target){
+	public boolean enoughBalance(double amount, Account target){
 		if (target.getBalance() >= amount){
 			return true;
 		}
@@ -73,7 +73,7 @@ public class Validator{
 	}
 
 	///checks to see if the company exists
-	boolean checkCompany(String company){
+	public boolean checkCompany(String company){
 		if(company.equals("EC") || company.equals("CQ") || company.equals("TV")){
 			return true;
 		}

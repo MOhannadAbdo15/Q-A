@@ -90,10 +90,9 @@ public class Writer
 		} 
 
 	}
-	
-	//String file1 = "mergedtransactions.txt";
-	//String file2 = "MasterBankAccounts.txt";
 
+	public Writer(){}
+	
 	public Writer(String[] args) {
 		
 		//Accept multiple transaction files
@@ -109,6 +108,7 @@ public class Writer
 			PrintWriter mergewriter = new PrintWriter(new FileOutputStream(new File("MergedBankAccountTransactionFile.txt"),true));
 			
 			//Loading transactions
+			//will run as many times as we have transaction files
 			for(int i= 1; i < args.length; i++){
 				BankAccountTransactions = args[i];
 				try{
@@ -149,9 +149,9 @@ public class Writer
 
 						String linestudent = line.substring(42,43);
 						
-						if(plan.equals("N ")){
+						if(plan.equals("N")){
 							newtransaction.setStudent(false);
-						}else if(plan.equals("S ")){
+						}else if(plan.equals("S")){
 							newtransaction.setStudent(true);
 						}else{
 							// System.out.println("Error found in Master Bank Accounts File");
@@ -213,8 +213,8 @@ public class Writer
 			}
 	    }
 	    catch(FileNotFoundException ex) {
-		System.out.println("Unable to open file '" + MasterBankAccounts + "'"); 
-	    }
+			System.out.println("Unable to open file '" + MasterBankAccounts + "'"); 
+		}
 	    catch(IOException ex) {
 	    	System.out.println("Error reading file '" + MasterBankAccounts + "'");  
 	    }
