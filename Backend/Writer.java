@@ -8,6 +8,7 @@ package Backend;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.*;
+import java.text.*;
 
 public class Writer 
 {
@@ -57,8 +58,11 @@ public class Writer
 				newAccount += mb.get(i).getNum() + " ";
 				newAccount += mb.get(i).getName() + " ";
 				newAccount += mb.get(i).getStatus() + " ";
-				newAccount += mb.get(i).getBalance() + " ";
+				// newAccount += mb.get(i).getBalance() + " ";
 				
+				NumberFormat formatter = new DecimalFormat("#0.00");
+				newAccount += formatter.format(mb.get(i).getBalance()) + " ";
+
 				//currentAccount will be written to the current bank accounts file
 				String currentAccount = newAccount;
 
@@ -140,7 +144,7 @@ public class Writer
 						//System.out.println(balance);
 
 						//*******Need to change to decimal precison of 2*******
-						float newBalance = Float.parseFloat(balance);
+						double newBalance = Double.parseDouble(balance);
 
 						newtransaction.setAmount(newBalance);
 
