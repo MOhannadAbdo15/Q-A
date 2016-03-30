@@ -114,33 +114,171 @@ public class WriterTester {
 
     //This test tests the IOException when trying to read the
     //master bank accounts file in the constructor
+    @Test(expected=IOException.class) 
+    public void writerinputoutputtest() throws Exception{
+        MasterBankAccounts = args[0];
+        FileReader fileReader1 = new FileReader(MasterBankAccounts);
+            
+        BufferedReader bufferedReader1 = new BufferedReader(fileReader1);
+    }
+
 
     //This test tests the IOException when trying to read the
     //transactions files in the constructor
-
+    @Test(expected=IOException.class) 
+    public void writerinputoutputtest() throws Exception{
+        BankAccountTransactions = args[i];
+        FileReader fileReader2 = new FileReader(BankAccountTransactions);
+        
+        BufferedReader bufferedReader2 = new BufferedReader(fileReader2);
+    }
     //This test tests the loading for loop zero times 
     //in the write constructor
+     @Test
+     public void forloadertest() {
+        String[] args = new String[3];
+        args[0] = "MasterBankAccounts.txt";
+
+        Writer w = new Writer(args);
+
+    }
+
 
     //This test tests the loading for loop one time
     //in the write constructor
+    @Test
+     public void forloadertest() {
+        String[] args = new String[3];
+        args[0] = "MasterBankAccounts.txt";
+        args[1] = "Deposit1.out.txt";
+
+
+        Writer w = new Writer(args);
+
+    }
 
     //This test tests the loading for loop two times
     //in the write constructor
+    @Test   
+    public void forloadertest() {
+        String[] args = new String[3];
+        args[0] = "MasterBankAccounts.txt";
+        args[1] = "Deposit1.out.txt";
+        args[2] = "Withdrawal1.out.txt";
+        
+
+        Writer w = new Writer(args);
+
+    }
 
     //This test tests the while loop inside the loading for loop
     //zero times
+    @Test   
+    public void forloadertest() {
+        String[] args = new String[2];
+        args[0] = "MasterBankAccounts.txt";
+        args[1] = "Deposit1.out.txt";
+        
+        ArrayList<Transaction> list = new ArrayList<Transaction>();
+
+        
+
+        Writer w = new Writer(args);
+        list.add(args[1])
+         assertNull(list);
+
+
+    }
+
+
+
+    
 
     //This test tests the while loop inside the loading for loop
     //one times
+   @Test   
+    public void forloadertest() {
+        String[] args = new String[2];
+        args[0] = "MasterBankAccounts.txt";
+        args[1] = "Deposit1.out.txt";
+        
+         Transaction t[] = new Transaction[1]; 
+        t[0] = new Transaction();
+        t[0].setCode("10");
+        t[0].setName("test account1");
+        t[0].setNum("00000");
+        t[0].setAmount(0.00);
+        t[0].setMisc("S ");
+        t[0].setStudent(false);
+        
+
+        Writer w = new Writer(args);
+        
+          assertNotNull(t);
 
     //This test tests the while loop inside the loading for loop
     //many times
+         @Test   
+    public void forloadertest() {
+        String[] args = new String[2];
+        args[0] = "MasterBankAccounts.txt";
+        args[1] = "Deposit1.out.txt";
+        
+          Transaction t[] = new Transaction[4]; 
+        t[0] = new Transaction();
+        t[1] = new Transaction();
+        t[2] = new Transaction();
+        t[3] = new Transaction();
+
+        t[0].setCode("10");
+        t[0].setName("test account1");
+        t[0].setNum("00000");
+        t[0].setAmount(0.00);
+        t[0].setMisc("S ");
+        t[0].setStudent(false);
+
+        t[1].setCode("04");
+        t[1].setName("test account1");
+        t[1].setNum("00001");
+        t[1].setAmount(100.00);
+        t[1].setMisc("00");
+        t[1].setStudent(false);
+
+        t[2].setCode("10");
+        t[2].setName("");
+        t[2].setNum("00000");
+        t[2].setAmount(0.00);
+        t[2].setMisc("A ");
+        t[2].setStudent(false);
+
+        t[3].setCode("01");
+        t[3].setName("test account1");
+        t[3].setNum("00001");
+        t[3].setAmount(100.00);
+        t[3].setMisc("00");
+        t[3].setStudent(false);
+
+
+        Writer w = new Writer(args);
+        
+          assertNotNull(t);
+
+
 
     //This test tests the FileNotFoundException when trying to 
     //read the accounts
 
+     @Test(expected=FileNotFoundException.class) 
+    public void writerfilenotfoundtest() throws Exception{
+    }
+
+
     //This test tests the IOException when trying to 
     //read the accounts
+
+     @Test(expected=Exception.class) 
+    public void writerfilenotfoundtest() throws Exception{
+    }
 
     //This test tests the write function of the writer class
     //Also tests the for loop many times
@@ -162,24 +300,108 @@ public class WriterTester {
 
     //This test tests the true side of the if condition inside
     //the write test that writes students or non students
+     @Test
+    public void writeriftest() {        
+       
+        Account a = new Account("00009","testenoughstudent", "A", 300.05, 0, true);
+
+        ArrayList<Account> list = new ArrayList<Account>();
+
+        Writer w = new Writer();
+  
+        alist.add(a);
+
+        w.setAccounts(list); 
+        w.write();
+          assertTrue (a.getStudent()==true);
+
+    }
+    public static junit.framework.Test suite(){
+       return new JUnit4TestAdapter(WriterTester.class);
+    }
 
 	//This test tests the false side of the if condition inside
     //the write test that writes students or non students
+    @Test
+    public void writeriftest() {        
+       
+       Account a = new Account("00001","testaccount1", "A", 123.00, 0, false);
+
+        ArrayList<Account> list = new ArrayList<Account>();
+
+        Writer w = new Writer();
+  
+        alist.add(a);
+
+        w.setAccounts(list); 
+        w.write();
+         assertFalse(a.getStudent()==false);
+
+    }
+    public static junit.framework.Test suite(){
+       return new JUnit4TestAdapter(WriterTester.class);
+    }
 
     //This test tests the for loop in the write function
     //zero times
+    @Test
+    public void writefortest() { 
+        ArrayList<Account> alist = new ArrayList<Account>();
+        Writer w = new Writer();
+        w.setAccounts(alist);
+        w.write();
+
+
+    }
+
 
     //This test tests the for loop in the write function
     //one times
+    @Test
+    public void writefortest() { 
+
+        Account a = new Account("00001","testaccount1", "A", 123.00, 0, false);
+
+        ArrayList<Account> alist = new ArrayList<Account>();
+
+        Writer w = new Writer();
+
+        alist.add(a);
+
+        w.setAccounts(alist);
+
+        w.write();
+
+    }
+
+
 
     //This test tests the for loop in the write function
     //two times
+    @Test
+    public void writefortest() { 
+
+        Account a = new Account("00001","testaccount1", "A", 123.00, 0, false);
+        Account a2 = new Account("00009","testenoughstudent", "A", 300.05, 0, true);
+
+        ArrayList<Account> alist = new ArrayList<Account>();
+
+        Writer w = new Writer();
+
+        alist.add(a);
+        alist.add(a2);
+
+        w.setAccounts(alist);
+
+        w.write();
+
+    }
 
     //This test tests the IOException in the write function
     //Not complete
     
     @Test(expected=Exception.class) 
-    public void writerfilenotfoundtest(){
+    public void writerfilenotfoundtest() throws Exception{
     }
 
     //Testing the set/getAccounts functions
