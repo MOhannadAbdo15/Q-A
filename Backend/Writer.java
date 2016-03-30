@@ -148,9 +148,6 @@ public class Writer
 				mb.add(newaccount);
 			}
 	    }
-	    catch(FileNotFoundException ex) {
-			System.out.println("Unable to open file '" + MasterBankAccounts + "'"); 
-		}
 	    catch(IOException ex) {
 	    	System.out.println("Error reading file '" + MasterBankAccounts + "'");  
 	    }

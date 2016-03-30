@@ -88,6 +88,26 @@ public class ValidatorTester {
         assertEquals(v.findAccount("10",alist),a2);
     }
 
+    //Test many loops through findAccount
+    @Test
+    public void findaccounttestmanyloops() {
+        Validator v = new Validator();
+        Account a1 = new Account();
+        Account a2 = new Account();
+        Account a3 = new Account();
+        ArrayList<Account> alist = new ArrayList<Account>();
+
+        a1.setNum("1");
+        a2.setNum("10");
+        a3.setNum("5");
+
+        alist.add(a1);
+        alist.add(a2);
+        alist.add(a3);
+
+        assertEquals(v.findAccount("10",alist),a2);
+    }
+
     //Test the findNextNumber function
     @Test
     public void findnextnumbertest() {
