@@ -28,7 +28,6 @@ public class Backend {
 	static private float sessionWithdrawn = 0;
 
 	static private void applyWithdrawal(Transaction transaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(transaction.getNum(), accounts);
 			//check login credentials
 			if (admin || (validator.accountMatchName(loginname, tempAcc))) {
@@ -38,11 +37,9 @@ public class Backend {
 					validator.findAccount(transaction.getNum(), accounts).incTransactions();
 				}
 			}			
-		}
 	}
 
 	static private void applyTransfer(Transaction sourcetransaction, Transaction desttransaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(sourcetransaction.getNum(), accounts);
 			Account tempDestAcc = validator.findAccount(sourcetransaction.getNum(), accounts);
 			//check login credentials
@@ -54,11 +51,9 @@ public class Backend {
 				validator.findAccount(sourcetransaction.getNum(), accounts).incTransactions();
 				validator.findAccount(desttransaction.getNum(), accounts).incTransactions();
 			}			
-		}
 	}
 
 	static private void applyPayBill(Transaction transaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(transaction.getNum(), accounts);
 			//check login credentials
 			if (admin || (validator.accountMatchName(loginname, tempAcc))) {
@@ -70,22 +65,18 @@ public class Backend {
 					}				
 				}
 			}			
-		}
 	}
 
 	static private void applyDeposit(Transaction transaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(transaction.getNum(), accounts);
 			//check login credentials
 			if (admin || (validator.accountMatchName(loginname, tempAcc))) {
 					validator.findAccount(transaction.getNum(), accounts).setBalance(tempAcc.getBalance() + transaction.getAmount());
 					validator.findAccount(transaction.getNum(), accounts).incTransactions();
 			}			
-		}
 	}
 
 	static private void applyCreate(Transaction transaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			//check login credentials
 			if (admin) {
 				tempAcc.setNum(validator.findNextNumber(accounts));
@@ -98,38 +89,29 @@ public class Backend {
 			}else {
 				System.out.println("ERROR: Attempting to create without admin credentials");
 			}
-		}
 	}
 
 	static private void applyDelete(Transaction transaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(transaction.getNum(), accounts);
 			//check if we've found the account
 			if (!(tempAcc == null)) {
 				//check login credentials
 				if (admin) {
-					//check if the account is a student account
-					if (validator.accountMatchName(loginname, tempAcc)) {
 						accounts.remove(tempAcc);
-					}else {
-						System.out.println("ERROR: Could not find account");
-					}
 				}else {
-					System.out.println("ERROR: Attempting to delete without admin credentials");
+					System.out.println("ERROR: Attempting to create without admin credentials");
 				}
 			}
-		}
 	}
 
 	static private void applyDisable(Transaction transaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(transaction.getNum(), accounts);
 			//check if we've found the account
 			if (!(tempAcc == null)) {
 				//check login credentials
 				if (admin || (validator.accountMatchName(loginname, tempAcc))) {
 					//check if the account is a student account
-					if (!(tempAcc.getStatus().equals("A"))) {
+					if (tempAcc.getStatus().equals("A")) {
 						validator.findAccount(transaction.getNum(), accounts).setStudent(true);
 						validator.findAccount(transaction.getNum(), accounts).incTransactions();
 					}else {
@@ -137,18 +119,16 @@ public class Backend {
 					}
 				}
 			}
-		}
 	}
 
 	static private void applyEnable(Transaction transaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(transaction.getNum(), accounts);
 			//check if we've found the account
 			if (!(tempAcc == null)) {
 				//check login credentials
 				if (admin || (validator.accountMatchName(loginname, tempAcc))) {
 					//check if the account is a student account
-					if (!(tempAcc.getStatus().equals("D"))) {
+					if (tempAcc.getStatus().equals("D")) {
 						validator.findAccount(transaction.getNum(), accounts).setStudent(true);
 						validator.findAccount(transaction.getNum(), accounts).incTransactions();
 					}else {
@@ -156,11 +136,9 @@ public class Backend {
 					}
 				}
 			}
-		}
 	}
 
 	static private void applyChangePlan(Transaction transaction){
-		if (validator.sessionLoggedIn(loggedin)) {
 			tempAcc = validator.findAccount(transaction.getNum(), accounts);
 			//check if we've found the account
 			if (!(tempAcc == null)) {
@@ -175,7 +153,6 @@ public class Backend {
 					}
 				}
 			}
-		}
 	}
 
 	static private void applyEndofSession(Transaction transaction){
@@ -219,7 +196,7 @@ public class Backend {
 		load(args);
 		handletransactions();
 		//Write out to file
-		System.out.println("====New Accounts====");
+		// System.out.println("====New Accounts====");
 		backendwriter.write();
 	}
 
@@ -243,57 +220,60 @@ public class Backend {
 		// transactions = new ArrayList<Transaction>();		
 		//iterate over all the entires in the transactions arraylist
 		for (int i = 0; i < transactions.size();i++) {
-			switch (transactions.get(i).getCode()){
-				case "01":
-					applyWithdrawal(transactions.get(i));
-					break;
-				case "02":
-					//transfer
-					//need to not be at the last transaction
-					if (i + 1 != transactions.size()) {
-						//need to check if next transaction is also transfer
-						if (transactions.get(i+1).getCode().equals("02")){
-							//apply transfer to this transaction and next transaction
-							applyTransfer(transactions.get(i), transactions.get(i+1));
-							//skip to next transaction
-							i++;
-						}else{
-							System.out.println("Transfer transactions must come in pairs");
-						}
-					}else{
-						System.out.println("Transfer transaction cannot be last");
+			if (transactions.get(i).getCode().equals("10")){
+				applyLogin(transactions.get(i));
+			}else{
+				if (loggedin) {
+					switch (transactions.get(i).getCode()){
+						case "01":
+							applyWithdrawal(transactions.get(i));
+							break;
+						case "02":
+							//transfer
+							//need to not be at the last transaction
+							if (i != transactions.size() - 1) {
+								//need to check if next transaction is also transfer
+								if (transactions.get(i+1).getCode().equals("02")){
+									//apply transfer to this transaction and next transaction
+									applyTransfer(transactions.get(i), transactions.get(i+1));
+									//skip to next transaction
+									i++;
+								}else{
+									System.out.println("Transfer transactions must come in pairs");
+								}
+							}else{
+								System.out.println("Transfer transaction cannot be last");
+							}
+							break;
+						case "03":
+							applyPayBill(transactions.get(i));
+							break;
+						case "04":
+							applyDeposit(transactions.get(i));
+							break;
+						case "05":
+							applyCreate(transactions.get(i));
+							break;
+						case "06":
+							applyDelete(transactions.get(i));
+							break;
+						case "07":
+							applyDisable(transactions.get(i));
+							break;
+						case "08":
+							applyChangePlan(transactions.get(i));
+							break;
+						case "09":
+							applyEnable(transactions.get(i));
+							break;
+						
+						case "00":
+							applyEndofSession(transactions.get(i));
+							break;
 					}
-					break;
-				case "03":
-					applyPayBill(transactions.get(i));
-					break;
-				case "04":
-					applyDeposit(transactions.get(i));
-					break;
-				case "05":
-					applyCreate(transactions.get(i));
-					break;
-				case "06":
-					applyDelete(transactions.get(i));
-					break;
-				case "07":
-					applyDisable(transactions.get(i));
-					break;
-				case "08":
-					applyChangePlan(transactions.get(i));
-					break;
-				case "09":
-					applyEnable(transactions.get(i));
-					break;
-				case "10":
-					applyLogin(transactions.get(i));
-					break;
-				case "00":
-					applyEndofSession(transactions.get(i));
-					break;
+				}
 			}
 		}
-
 		
 		// for (int i = 0; i < accounts.size();i++) {
 		// 	accounts.get(i).printAccount();
@@ -309,5 +289,13 @@ public class Backend {
 
 	public ArrayList<Transaction> getTransactions(){
 		return transactions;
+	}
+
+	public void setTransactions(ArrayList<Transaction> newtransactions){
+		transactions = newtransactions;
+	}
+
+	public void setAccounts(ArrayList<Account> newaccounts){
+		accounts = newaccounts;
 	}
 }

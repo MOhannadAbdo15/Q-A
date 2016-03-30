@@ -75,7 +75,7 @@ public class Writer
 					currentAccount += "N"; 
 				}
 
-				System.out.println(newAccount);
+				// System.out.println(newAccount);
 
 				newAccount += "\n";
 				currentAccount += "\n";
@@ -105,6 +105,55 @@ public class Writer
 		
 		//Bank Accounts file is the first argument
 		MasterBankAccounts = args[0];
+
+		//Read Accounts
+	    try {
+	    	
+	        // FileReader reads text files in the default encoding.
+	        FileReader fileReader1 = new FileReader(MasterBankAccounts);
+	        
+	        //Scanner in = new Scanner(fileReader1);
+	    
+	        // Always wrap FileReader in BufferedReader.
+	        BufferedReader bufferedReader1 = new BufferedReader(fileReader1);
+	
+			String line1 = "";
+			line1 = bufferedReader1.readLine();
+			while(line1!=null){
+
+				Account newaccount = new Account();
+
+				newaccount.setNum(line1.substring(0,5));
+				newaccount.setName(line1.substring(6,25).trim());
+				newaccount.setStatus(line1.substring(26,27));
+
+				String balance = line1.substring(28, 36);
+				float newBalance = Float.parseFloat(balance);
+				newaccount.setBalance(newBalance);
+
+				String t = line1.substring(37, 41);
+				int newt = Integer.parseInt(t);
+				newaccount.setTransactions(newt);
+				String newstudent = line1.substring(42,43);
+				if (newstudent.equals("N")){
+					newaccount.setStudent(false);
+				}else{
+					newaccount.setStudent(true);
+				}
+				newaccount.setCreated(false);
+				newaccount.setFrozen(0);
+
+				line1 = bufferedReader1.readLine();
+
+				mb.add(newaccount);
+			}
+	    }
+	    catch(FileNotFoundException ex) {
+			System.out.println("Unable to open file '" + MasterBankAccounts + "'"); 
+		}
+	    catch(IOException ex) {
+	    	System.out.println("Error reading file '" + MasterBankAccounts + "'");  
+	    }
 
 		//BankAccountTransactions = args[1];
 		try{
@@ -157,6 +206,7 @@ public class Writer
 							newtransaction.setStudent(false);
 						}else if(plan.equals("S")){
 							newtransaction.setStudent(true);
+		
 						}else{
 							// System.out.println("Error found in Master Bank Accounts File");
 						}
@@ -174,54 +224,6 @@ public class Writer
 	    	System.out.println("Error reading file");
 		}  
 
-		//Read Accounts
-	    try {
-	    	
-	        // FileReader reads text files in the default encoding.
-	        FileReader fileReader1 = new FileReader(MasterBankAccounts);
-	        
-	        //Scanner in = new Scanner(fileReader1);
-	    
-	        // Always wrap FileReader in BufferedReader.
-	        BufferedReader bufferedReader1 = new BufferedReader(fileReader1);
-	
-			String line1 = "";
-			line1 = bufferedReader1.readLine();
-			while(line1!=null){
-
-				Account newaccount = new Account();
-
-				newaccount.setNum(line1.substring(0,5));
-				newaccount.setName(line1.substring(6,25).trim());
-				newaccount.setStatus(line1.substring(26,27));
-
-				String balance = line1.substring(28, 36);
-				float newBalance = Float.parseFloat(balance);
-				newaccount.setBalance(newBalance);
-
-				String t = line1.substring(37, 41);
-				int newt = Integer.parseInt(t);
-				newaccount.setTransactions(newt);
-				String newstudent = line1.substring(42,43);
-				if (newstudent.equals("N")){
-					newaccount.setStudent(false);
-				}else{
-					newaccount.setStudent(true);
-				}
-				newaccount.setCreated(false);
-				newaccount.setFrozen(0);
-
-				line1 = bufferedReader1.readLine();
-
-				mb.add(newaccount);
-			}
-	    }
-	    catch(FileNotFoundException ex) {
-			System.out.println("Unable to open file '" + MasterBankAccounts + "'"); 
-		}
-	    catch(IOException ex) {
-	    	System.out.println("Error reading file '" + MasterBankAccounts + "'");  
-	    }
 	}
 
 }
