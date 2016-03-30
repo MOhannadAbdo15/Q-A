@@ -45,7 +45,13 @@ public class Validator{
 				largest = Integer.parseInt(accounts.get(i).getNum());
 			}
 		}
-		return Integer.toString(largest+1);
+
+		String next = Integer.toString(largest+1);
+
+		for (int i = 0;i < 7-(next.length());i++) {
+			next = "0" + next;
+		}
+		return next;
 	}
 
 	//Checks if the given file was just created

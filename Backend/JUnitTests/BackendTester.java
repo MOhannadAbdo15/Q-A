@@ -15,7 +15,7 @@ import Backend.*;
 import java.text.*;
 import java.io.*;
 
-public class BackendTester {
+public class InitTester {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
@@ -84,35 +84,7 @@ public class BackendTester {
         }
     }
 
-    //Test the apply login transaction when not logged in
-    // @Test
-    // public void notlogintest() { 
-    //     Backend b = new Backend();
-    //     String[] args = new String[1];
-    //     args[0] = "MasterBankAccounts.txt";
-
-    //     tlist.clear();
-
-    //     Transaction t = new Transaction();
-    //     t.setCode("10");
-    //     t.setMisc("S");
-    //     t.setName("");
-
-    //     Transaction t2 = new Transaction();
-    //     t2.setCode("10");
-    //     t2.setMisc("S");
-    //     t2.setName("");
-
-    //     tlist.add(t);
-    //     tlist.add(t2);
-
-    //     b.load(args,b.getAccounts());
-    //     b.setTransactions(tlist);
-    //     b.handletransactions(b.getAccounts());
-    //     assertEquals("ERROR: Log in transaction when logged in already\n", outContent.toString());
-    // }
-
     public static junit.framework.Test suite(){
-       return new JUnit4TestAdapter(BackendTester.class);
+       return new JUnit4TestAdapter(InitTester.class);
     }
 }

@@ -192,7 +192,6 @@ public class Writer
 						String balance = line.substring(30, 38);
 						//System.out.println(balance);
 
-						//*******Need to change to decimal precison of 2*******
 						double newBalance = Double.parseDouble(balance);
 
 						newtransaction.setAmount(newBalance);

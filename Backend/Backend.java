@@ -24,7 +24,7 @@ public class Backend {
 	static private boolean loggedin = false;
 
 	static private Validator validator = new Validator();
-	static private Account tempAcc;
+	static private Account tempAcc = new Account();
 	static private float sessionWithdrawn = 0;
 
 	static private void applyWithdrawal(Transaction transaction){
@@ -41,7 +41,7 @@ public class Backend {
 
 	static private void applyTransfer(Transaction sourcetransaction, Transaction desttransaction){
 			tempAcc = validator.findAccount(sourcetransaction.getNum(), accounts);
-			Account tempDestAcc = validator.findAccount(sourcetransaction.getNum(), accounts);
+			Account tempDestAcc = validator.findAccount(desttransaction.getNum(), accounts);
 			//check login credentials
 			if (admin || (validator.accountMatchName(loginname, tempAcc))) {
 				//set balances of the two accounts
@@ -58,7 +58,7 @@ public class Backend {
 			//check login credentials
 			if (admin || (validator.accountMatchName(loginname, tempAcc))) {
 				//check if the comapny exists
-				if(validator.checkCompany(transaction.getCode())){
+				if(validator.checkCompany(transaction.getMisc())){
 					if (tempAcc.getBalance() >= transaction.getAmount()) {
 						validator.findAccount(transaction.getNum(), accounts).setBalance(tempAcc.getBalance() - transaction.getAmount());					
 						validator.findAccount(transaction.getNum(), accounts).incTransactions();
@@ -86,6 +86,7 @@ public class Backend {
 				tempAcc.setTransactions(0);
 				tempAcc.setStudent(false);
 				tempAcc.setCreated(true);
+				accounts.add(tempAcc);
 			}else {
 				System.out.println("ERROR: Attempting to create without admin credentials");
 			}
@@ -112,7 +113,7 @@ public class Backend {
 				if (admin || (validator.accountMatchName(loginname, tempAcc))) {
 					//check if the account is a student account
 					if (tempAcc.getStatus().equals("A")) {
-						validator.findAccount(transaction.getNum(), accounts).setStudent(true);
+						validator.findAccount(transaction.getNum(), accounts).setStatus("D");
 						validator.findAccount(transaction.getNum(), accounts).incTransactions();
 					}else {
 						System.out.println("ERROR: Attempting to disable a disabled account");
@@ -129,7 +130,7 @@ public class Backend {
 				if (admin || (validator.accountMatchName(loginname, tempAcc))) {
 					//check if the account is a student account
 					if (tempAcc.getStatus().equals("D")) {
-						validator.findAccount(transaction.getNum(), accounts).setStudent(true);
+						validator.findAccount(transaction.getNum(), accounts).setStatus("A");
 						validator.findAccount(transaction.getNum(), accounts).incTransactions();
 					}else {
 						System.out.println("ERROR: Attempting to enable an enabled account");
@@ -139,20 +140,20 @@ public class Backend {
 	}
 
 	static private void applyChangePlan(Transaction transaction){
-			tempAcc = validator.findAccount(transaction.getNum(), accounts);
-			//check if we've found the account
-			if (!(tempAcc == null)) {
-				//check login credentials
-				if (admin || (validator.accountMatchName(loginname, tempAcc))) {
-					//check if the account is a student account
-					if (!(tempAcc.getStudent() == true)) {
-						validator.findAccount(transaction.getNum(), accounts).setStudent(true);
-						validator.findAccount(transaction.getNum(), accounts).incTransactions();
-					}else {
-						System.out.println("ERROR: Attempting to change plan on a student account");
-					}
+		tempAcc = validator.findAccount(transaction.getNum(), accounts);
+		//check if we've found the account
+		if (!(tempAcc == null)) {
+			//check login credentials
+			if (admin || (validator.accountMatchName(loginname, tempAcc))) {
+				//check if the account is a student account
+				if (!(tempAcc.getStudent() == true)) {
+					validator.findAccount(transaction.getNum(), accounts).setStudent(true);
+					validator.findAccount(transaction.getNum(), accounts).incTransactions();
+				}else {
+					System.out.println("ERROR: Attempting to change plan on a student account");
 				}
 			}
+		}
 	}
 
 	static private void applyEndofSession(Transaction transaction){
